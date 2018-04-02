@@ -18,16 +18,23 @@ object Huffman {
    * present in the leaves below it. The weight of a `Fork` node is the sum of the weights of these
    * leaves.
    */
-    abstract class CodeTree
+  abstract class CodeTree
   case class Fork(left: CodeTree, right: CodeTree, chars: List[Char], weight: Int) extends CodeTree
   case class Leaf(char: Char, weight: Int) extends CodeTree
   
 
   // Part 1: Basics
-    def weight(tree: CodeTree): Int = ??? // tree match ...
+    def weight(tree: CodeTree): Int = tree match {
+      case Leaf(ch, w) => w
+      case Fork(l, r, chs, w) => w //weight(l) + weight(r)
+    }
   
-    def chars(tree: CodeTree): List[Char] = ??? // tree match ...
-  
+    def chars(tree: CodeTree): List[Char] = tree match {
+      case Leaf(c, w) => List[Char](c)
+      case Fork(l, r, chs, w) => chs
+
+    }
+
   def makeCodeTree(left: CodeTree, right: CodeTree) =
     Fork(left, right, chars(left) ::: chars(right), weight(left) + weight(right))
 
@@ -69,7 +76,21 @@ object Huffman {
    *       println("integer is  : "+ theInt)
    *   }
    */
-    def times(chars: List[Char]): List[(Char, Int)] = ???
+    def times(chars: List[Char]): List[(Char, Int)] = {
+      if (chars.isEmpty) List[(Char, Int)]()
+      else count_chars(chars.head, times(chars.tail))
+
+      def count_chars(char: Char, chars_occ_list: List[(Char, Int)]): List[(Char, Int)] = {
+        if(chars_occ_list.isEmpty)
+          List[(Char, Int)](char,1)
+        else {
+          if(chars_occ_list.head._1 == char)
+            (chars_occ_list.head._1, chars_occ_list.head._2 + 1) :: chars_occ_list.tail
+          else
+             chars_occ_list.head :: count_chars(char, chars_occ_list.tail)
+        }
+      }
+    }
   
   /**
    * Returns a list of `Leaf` nodes for a given frequency table `freqs`.
@@ -78,7 +99,9 @@ object Huffman {
    * head of the list should have the smallest weight), where the weight
    * of a leaf is the frequency of the character.
    */
-    def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = ???
+    def makeOrderedLeafList(freqs: List[(Char, Int)]): List[Leaf] = {
+      
+    }
   
   /**
    * Checks whether the list `trees` contains only one single code tree.
